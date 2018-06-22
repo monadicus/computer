@@ -1,5 +1,5 @@
 %
-%  marelle
+%  computer
 %
 %  Test driven system administration.
 %
@@ -20,7 +20,7 @@
 
 :- dynamic platform/1.
 
-marelle_version('dev').
+computer_version('dev').
 
 % pkg(?Pkg) is nondet.
 %   Is this a defined package name?
@@ -32,9 +32,9 @@ marelle_version('dev').
 %   Try to install this package.
 
 % where to look for dependencies
-marelle_search_path('~/.marelle/deps').
-marelle_search_path('marelle-deps').
-marelle_search_path('deps').
+computer_search_path('~/.computer/deps').
+computer_search_path('computer-deps').
+computer_search_path('deps').
 
 %
 %  CORE CODE
@@ -114,7 +114,7 @@ main(profile, [Cmd|Rest]) :- !, profile(main(Cmd, Rest)).
 main(time, [Cmd|Rest]) :- !, time(main(Cmd, Rest)).
 
 main(version, []) :-
-    marelle_version(V), writeln(V).
+    computer_version(V), writeln(V).
 
 main(_, _) :- !, usage.
 
@@ -224,7 +224,7 @@ package_state(Ann) :-
 %   a project specific directory.
 load_deps :-
     findall(P, (
-        marelle_search_path(P0),
+        computer_search_path(P0),
         expand_path(P0, P),
         exists_directory(P)
     ), Ps),
@@ -240,15 +240,15 @@ load_deps(Dir) :-
     load_files(Deps).
 
 usage :-
-    writeln('Usage: marelle list [pattern]'),
-    writeln('       marelle scan [--all | --missing]'),
-    writeln('       marelle met [-q] <target>'),
-    writeln('       marelle meet <target>'),
-    writeln('       marelle platform'),
-    writeln('       marelle version'),
+    writeln('Usage: computer list [pattern]'),
+    writeln('       computer scan [--all | --missing]'),
+    writeln('       computer met [-q] <target>'),
+    writeln('       computer meet <target>'),
+    writeln('       computer platform'),
+    writeln('       computer version'),
     writeln(''),
-    writeln('Detect and meet dependencies. Searches ~/.marelle/deps and the folder'),
-    writeln('marelle-deps in the current directory if it exists.').
+    writeln('Detect and meet dependencies. Searches ~/.computer/deps and the folder'),
+    writeln('computer-deps in the current directory if it exists.').
 
 % which(+Command, -Path) is semidet.
 %   See if a command is available in the current PATH, and return the path to
@@ -374,13 +374,13 @@ sh_output(Cmd0, Output) :-
 
 bash_output(Cmd, Output) :- sh_output(Cmd, Output).
 
-:- dynamic marelle_has_been_updated/0.
+:- dynamic computer_has_been_updated/0.
 
 pkg(selfupdate).
-met(selfupdate, _) :- marelle_has_been_updated.
+met(selfupdate, _) :- computer_has_been_updated.
 meet(selfupdate, _) :-
-    sh('cd ~/.local/marelle && git pull'),
-    assertz(marelle_has_been_updated).
+    sh('cd ~/.local/computer && git pull'),
+    assertz(computer_has_been_updated).
 
 :- include('00-util').
 :- include('01-python').

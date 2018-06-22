@@ -1,6 +1,6 @@
 %
 %  07-managed.pl
-%  marelle
+%  computer
 %
 %  Shorthand for completely managed packages.
 %

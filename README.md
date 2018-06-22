@@ -1,13 +1,13 @@
-# Marelle ("hopscotch")
+# Computer ("hopscotch")
 
-[![Build Status](https://travis-ci.org/larsyencken/marelle.png)](https://travis-ci.org/larsyencken/marelle) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/larsyencken/marelle)
+[![Build Status](https://travis-ci.org/monadicus/computer.png)](https://travis-ci.org/monadicus/computer) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/monadicus/computer)
 
 
 Test-driven system administration in SWI-Prolog, in the style of [Babushka](https://github.com/benhoskings/babushka).
 
-Marelle uses [logic programming](https://en.wikipedia.org/wiki/Logic_programming) to describe system targets and rules by which these targets can be met. Prolog's built-in search mechanism makes writing and using these dependencies elegant. Anecdotally, writing deps for Marelle has the feel of teaching it about types of packages, rather than the feel of writing package templates.
+Computer uses [logic programming](https://en.wikipedia.org/wiki/Logic_programming) to describe system targets and rules by which these targets can be met. Prolog's built-in search mechanism makes writing and using these dependencies elegant. Anecdotally, writing deps for Computer has the feel of teaching it about types of packages, rather than the feel of writing package templates.
 
-![Hopscotch for Seniors](https://raw.github.com/wiki/larsyencken/marelle/img/HopscotchForSeniors.jpg)
+![Hopscotch for Seniors](https://raw.github.com/wiki/monadicus/computer/img/HopscotchForSeniors.jpg)
 
 ## Current status
 
@@ -15,7 +15,7 @@ Experimental but working.
 
 ## Features
 
-Marelle has some features common to other configuration management frameworks:
+Computer has some features common to other configuration management frameworks:
 
 - Checking and meeting dependencies (preconditions)
 - Testing whether a target installed correctly (post-conditions)
@@ -27,7 +27,7 @@ It also has some interesting differences:
 - The dependencies of a target can vary by platform
 - Succinct definition of new classes of packages using logical rules
 
-## Installing marelle
+## Installing computer
 
 ### Quickstart
 
@@ -35,10 +35,10 @@ Pick a bootstrap script from the options below. If you're not sure, choose the s
 
 Version | Bootstrap command
 ------- | -----------------
-_0.1.0 (stable)_ | `bash -c "$(curl -fsSL https://raw.githubusercontent.com/larsyencken/marelle/versions/0.1.0/bootstrap.sh)"`
-_master (dev)_ | `bash -c "$(curl -fsSL https://raw.githubusercontent.com/larsyencken/marelle/master/bootstrap.sh)"`
+_0.1.0 (stable)_ | `bash -c "$(curl -fsSL https://raw.githubusercontent.com/monadicus/computer/versions/0.1.0/bootstrap.sh)"`
+_master (dev)_ | `bash -c "$(curl -fsSL https://raw.githubusercontent.com/monadicus/computer/master/bootstrap.sh)"`
 
-This will install marelle for all users, putting the executable in `/usr/local/bin/marelle`.
+This will install computer for all users, putting the executable in `/usr/local/bin/computer`.
 
 ### Manual version
 
@@ -50,20 +50,20 @@ This will install marelle for all users, putting the executable in `/usr/local/b
     - On OS X, with Homebrew: `brew install git`
     - On Ubuntu, with apt-get: `sudo apt-get install git`
     - On FreeBSD, with pkgng: `sudo pkg install git`
-3. Clone and set up marelle
+3. Clone and set up computer
 
 ```bash
 # clone the repo
 mkdir -p ~/.local
-git clone https://github.com/larsyencken/marelle ~/.local/marelle
+git clone https://github.com/monadicus/computer ~/.local/computer
 
 # set up an executable in ~/.local/bin
 mkdir -p ~/.local/bin
-cat >~/.local/bin/marelle <<EOF
+cat >~/.local/bin/computer <<EOF
 #!/bin/sh
-exec swipl -q -t main -s ~/.local/marelle/marelle.pl "\$@"
+exec swipl -q -t main -s ~/.local/computer/computer.pl "\$@"
 EOF
-chmod a+x ~/.local/bin/marelle
+chmod a+x ~/.local/bin/computer
 
 # add ~/.local/bin to your PATH
 # (the exact commands depend on the shell you use)
@@ -73,7 +73,7 @@ source ~/.profile
 
 ## Writing deps
 
-Make a `marelle-deps/` folder inside your project repo. Each package has two components, a `met/2` goal which checks if the dependency is met, and an `meet/2` goal with instructions on how to actually meet it if it's missing.
+Make a `computer-deps/` folder inside your project repo. Each package has two components, a `met/2` goal which checks if the dependency is met, and an `meet/2` goal with instructions on how to actually meet it if it's missing.
 
 For example, suppose I want to write a dep for Python that works on recent Ubuntu flavours. I might write:
 
@@ -90,7 +90,7 @@ meet(python, linux(_)) :-
     sh('sudo apt-get install -y python-dev').
 ```
 
-To install python on a machine, I'd now run `marelle meet python`.
+To install python on a machine, I'd now run `computer meet python`.
 
 To install pip, I might write:
 
@@ -106,7 +106,7 @@ meet(pip, linux(_)) :- install_apt('python-pip').
 % on all platforms, pip depends on python
 depends(pip, _, [python]).
 ```
-Note our our use of platform specifiers and the `_` wildcard in their place. To see your current platform as described by marelle, run `marelle platform`. Examples include: `osx`, `linux(precise)` and `linux(raring)`.
+Note our our use of platform specifiers and the `_` wildcard in their place. To see your current platform as described by computer, run `computer platform`. Examples include: `osx`, `linux(precise)` and `linux(raring)`.
 
 ## Running deps
 
@@ -114,29 +114,29 @@ Note our our use of platform specifiers and the `_` wildcard in their place. To 
 
 This runs every `met/2` statement that's valid for your platform.
 
-`marelle scan`
+`computer scan`
 
 ### Install something
 
 This will run the `meet/2` clause for your package, provided a valid one exists for your current platform.
 
-`marelle meet python`
+`computer meet python`
 
 ### See your platform
 
 To find the right platform code to use in deps you're writing, run:
 
-`marelle platform`
+`computer platform`
 
 It reports the code for the platform you're currently on.
 
 ## Where to put your deps
 
-Like both Babushka and Babashka, Marelle looks for deps in `~/.marelle/deps` and in a folder called `marelle-deps` in the current directory, if either exists. This allows you to set up a personal set of deps for your environment, as well as project-specific deps.
+Like both Babushka and Babashka, Computer looks for deps in `~/.computer/deps` and in a folder called `computer-deps` in the current directory, if either exists. This allows you to set up a personal set of deps for your environment, as well as project-specific deps.
 
 ## Examples
 
-See my [marelle-deps](https://github.com/larsyencken/marelle-deps) repo for working examples.
+See [computer-deps](https://github.com/monadicus/computer-deps) repo for working examples.
 
 ## Developing
 

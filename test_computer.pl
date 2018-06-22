@@ -1,13 +1,13 @@
 %
-%  test_marelle.pl
-%  marelle
+%  test_computer.pl
+%  computer
 %
-%  Unit tests for Marelle.
+%  Unit tests for Computer.
 %
 
-:- begin_tests(marelle).
+:- begin_tests(computer).
 
-:- include('marelle').
+:- include('computer').
 
 test(sh) :-
     sh(echo),
@@ -22,7 +22,7 @@ test(isdir) :-
     isdir('/tmp/2739b22b11ee348c6eda77b57c577485').
 
 test(isfile) :-
-    isfile('marelle.pl'),
+    isfile('computer.pl'),
     \+ isfile('.'),
     sh('mkdir -p /tmp/2739b22b11ee348c6eda77b57c577485'),
     \+ isfile('/tmp/2739b22b11ee348c6eda77b57c577485'),
@@ -58,4 +58,4 @@ test(join) :-
     join(['one', ' two'], 'one two'),
     join(['one', ' two', ' and three'], 'one two and three').
 
-:- end_tests(marelle).
+:- end_tests(computer).

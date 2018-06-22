@@ -1,6 +1,6 @@
 %
 %  04-apt.pl
-%  marelle-deps
+%  computer-deps
 %
 
 % installs_with_apt(Pkg).

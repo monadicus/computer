@@ -1,6 +1,6 @@
 %
 %  02-fs.pl
-%  marelle-deps
+%  computer-deps
 %
 
 :- multifile symlink_step/3.

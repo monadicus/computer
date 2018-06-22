@@ -1,6 +1,6 @@
 %
 %  sudo.pl
-%  marelle
+%  computer
 %
 
 % sudo_tell/1.

@@ -1,6 +1,6 @@
 %
 %  08-pacman.pl
-%  marelle-deps
+%  computer-deps
 %
 
 % installs_with_pacman(Pkg).

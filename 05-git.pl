@@ -1,6 +1,6 @@
 %
 %  05-git.pl
-%  marelle-deps
+%  computer-deps
 %
 
 :- multifile git_step/3.

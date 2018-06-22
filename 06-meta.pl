@@ -1,6 +1,6 @@
 %
 %  06-meta.pl
-%  marelle-deps
+%  computer-deps
 %
 
 % meta_pkg(Name, Plat, Deps).

@@ -1,6 +1,6 @@
 %
 %  09-freebsd.pl
-%  marelle
+%  computer
 %
 
 % installs_with_pkgng(Pkg).

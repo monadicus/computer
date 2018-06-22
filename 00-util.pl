@@ -1,6 +1,6 @@
 %
 %  util.pl
-%  marelle-deps
+%  computer-deps
 %
 %  Utility methods common to multiple deps.
 %

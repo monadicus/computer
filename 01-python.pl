@@ -1,6 +1,6 @@
 %
 %  01-python-helpers.pl
-%  marelle-deps
+%  computer-deps
 %
 
 % python_pkg(-Pkg) is nondet.

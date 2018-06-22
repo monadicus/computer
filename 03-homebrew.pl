@@ -1,6 +1,6 @@
 %
 %  03-homebrew.pl
-%  marelle-deps
+%  computer-deps
 %
 %  Helpers for working with Homebrew.
 %  http://mxcl.github.io/homebrew/

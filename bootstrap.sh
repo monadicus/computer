@@ -2,11 +2,11 @@
 #
 #  bootstrap.sh
 #
-#  Install marelle for all users.
+#  Install computer for all users.
 #
 
-DEST_DIR=/usr/local/share/marelle
-DEST_BIN=/usr/local/bin/marelle
+DEST_DIR=/usr/local/share/computer
+DEST_BIN=/usr/local/bin/computer
 
 function has_exec() {
   [ ! -z "$(which $1)" ]
@@ -112,18 +112,18 @@ function check_in_path() {
 }
 
 
-function checkout_marelle() {
-  echo 'Trying to check out marelle'
+function checkout_computer() {
+  echo 'Trying to check out computer'
   sudo mkdir -p "${DEST_DIR}"
   cd "$(dirname ${DEST_DIR})"
-  sudo git clone -b versions/0.1.0 https://github.com/larsyencken/marelle
+  sudo git clone -b versions/0.1.0 https://github.com/monadicus/computer
   sudo sh -c "cat > ${DEST_BIN}" <<EOF
 #!/bin/sh
-exec swipl -q -t main -s "${DEST_DIR}/marelle.pl" "\$@"
+exec swipl -q -t main -s "${DEST_DIR}/computer.pl" "\$@"
 EOF
   sudo chmod a+x "${DEST_BIN}"
   if [ ! -d "${DEST_DIR}" -o ! -x "${DEST_BIN}" ]; then
-    bail "Ran into a problem checking out marelle"
+    bail "Ran into a problem checking out computer"
   fi
 }
 
@@ -141,15 +141,15 @@ function main() {
   echo 'Prolog: OK'
 
   if [ ! -d "${DEST_DIR}" ]; then
-    checkout_marelle
+    checkout_computer
   fi
-  echo 'Marelle: OK'
+  echo 'Computer: OK'
 
   hash -r
-  if missing_exec marelle; then
-    bail "Couldn't setup marelle in PATH"
+  if missing_exec computer; then
+    bail "Couldn't setup computer in PATH"
   fi
-  echo 'Marelle in PATH: OK'
+  echo 'Computer in PATH: OK'
   echo 'DONE'
 }
 

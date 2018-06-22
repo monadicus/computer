@@ -2,7 +2,7 @@
 #
 #  bootstrap_dev.sh
 #
-#  Install marelle for the current user only.
+#  Install computer for the current user only.
 #
 
 function has_exec() {
@@ -109,22 +109,22 @@ function check_in_path() {
 }
 
 
-function checkout_marelle() {
-  echo 'Trying to check out marelle'
+function checkout_computer() {
+  echo 'Trying to check out computer'
   mkdir -p ~/.local/bin
-  git clone https://github.com/larsyencken/marelle ~/.local/marelle
-  cat >~/.local/bin/marelle <<EOF
+  git clone https://github.com/larsyencken/computer ~/.local/computer
+  cat >~/.local/bin/computer <<EOF
 #!/bin/sh
-exec swipl -q -t main -s ~/.local/marelle/marelle.pl "\$@"
+exec swipl -q -t main -s ~/.local/computer/computer.pl "\$@"
 EOF
-  chmod a+x ~/.local/bin/marelle
-  if [ ! -d ~/.local/marelle -o ! -x ~/.local/bin/marelle ]; then
-    bail "Ran into a problem checking out marelle"
+  chmod a+x ~/.local/bin/computer
+  if [ ! -d ~/.local/computer -o ! -x ~/.local/bin/computer ]; then
+    bail "Ran into a problem checking out computer"
   fi
 }
 
-function put_marelle_in_path() {
-  echo 'Checking if marelle is in PATH'
+function put_computer_in_path() {
+  echo 'Checking if computer is in PATH'
   if [ -f ~/.bash_profile ]; then
     echo 'export PATH=~/.local/bin:$PATH' >>~/.bash_profile
     source ~/.bash_profile
@@ -132,8 +132,8 @@ function put_marelle_in_path() {
     echo 'export PATH=~/.local/bin:$PATH' >>~/.profile
     source ~/.profile
   fi
-  if missing_exec marelle; then
-    bail "Couldn't set up marelle in PATH. Add ~/.local/bin to your PATH in your shell's rc."
+  if missing_exec computer; then
+    bail "Couldn't set up computer in PATH. Add ~/.local/bin to your PATH in your shell's rc."
   fi
 }
 
@@ -150,16 +150,16 @@ function main() {
   fi
   echo 'Prolog: OK'
 
-  if [ ! -d ~/.local/marelle ]; then
-    checkout_marelle
+  if [ ! -d ~/.local/computer ]; then
+    checkout_computer
   fi
-  echo 'Marelle: OK'
+  echo 'Computer: OK'
 
   hash -r
-  if missing_exec marelle; then
-    put_marelle_in_path
+  if missing_exec computer; then
+    put_computer_in_path
   fi
-  echo 'Marelle in PATH: OK'
+  echo 'Computer in PATH: OK'
   echo 'DONE'
 }
 
