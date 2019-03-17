@@ -379,7 +379,7 @@ bash_output(Cmd, Output) :- sh_output(Cmd, Output).
 pkg(selfupdate).
 met(selfupdate, _) :- computer_has_been_updated.
 meet(selfupdate, _) :-
-    sh('cd ~/.local/computer && git pull'),
+    sh('cd ~/.computer/computer && git pull'),
     assertz(computer_has_been_updated).
 
 :- include('00-util').

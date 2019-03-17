@@ -111,14 +111,14 @@ function check_in_path() {
 
 function checkout_computer() {
   echo 'Trying to check out computer'
-  mkdir -p ~/.local/bin
-  git clone https://github.com/larsyencken/computer ~/.local/computer
-  cat >~/.local/bin/computer <<EOF
+  mkdir -p ~/.computer/bin
+  git clone https://github.com/monadicus/computer ~/.computer/computer
+  cat >~/.computer/bin/computer <<EOF
 #!/bin/sh
-exec swipl -q -t main -s ~/.local/computer/computer.pl "\$@"
+exec swipl -q -t main -s ~/.computer/computer/computer.pl "\$@"
 EOF
-  chmod a+x ~/.local/bin/computer
-  if [ ! -d ~/.local/computer -o ! -x ~/.local/bin/computer ]; then
+  chmod a+x ~/.computer/bin/computer
+  if [ ! -d ~/.computer/computer -o ! -x ~/.computer/bin/computer ]; then
     bail "Ran into a problem checking out computer"
   fi
 }
@@ -126,19 +126,19 @@ EOF
 function put_computer_in_path() {
   echo 'Checking if computer is in PATH'
   if [ -f ~/.bash_profile ]; then
-    echo 'export PATH=~/.local/bin:$PATH' >>~/.bash_profile
+    echo 'export PATH=~/.computer/bin:$PATH' >>~/.bash_profile
     source ~/.bash_profile
   elif [ -f ~/.profile ]; then
-    echo 'export PATH=~/.local/bin:$PATH' >>~/.profile
+    echo 'export PATH=~/.computer/bin:$PATH' >>~/.profile
     source ~/.profile
   fi
   if missing_exec computer; then
-    bail "Couldn't set up computer in PATH. Add ~/.local/bin to your PATH in your shell's rc."
+    bail "Couldn't set up computer in PATH. Add ~/.computer/bin to your PATH in your shell's rc."
   fi
 }
 
 function main() {
-  echo 'BOOTSTRAPPING MARELLE'
+  echo 'BOOTSTRAPPING COMPUTER'
 
   if missing_exec git; then
     install_git
@@ -150,7 +150,7 @@ function main() {
   fi
   echo 'Prolog: OK'
 
-  if [ ! -d ~/.local/computer ]; then
+  if [ ! -d ~/.computer/computer ]; then
     checkout_computer
   fi
   echo 'Computer: OK'

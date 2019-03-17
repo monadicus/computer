@@ -128,7 +128,7 @@ EOF
 }
 
 function main() {
-  echo 'BOOTSTRAPPING MARELLE'
+  echo 'BOOTSTRAPPING COMPUTER'
 
   if missing_exec git; then
     install_git

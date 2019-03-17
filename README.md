@@ -54,20 +54,20 @@ This will install computer for all users, putting the executable in `/usr/local/
 
 ```bash
 # clone the repo
-mkdir -p ~/.local
-git clone https://github.com/monadicus/computer ~/.local/computer
+mkdir -p ~/.computer
+git clone https://github.com/monadicus/computer ~/.computer/computer
 
-# set up an executable in ~/.local/bin
-mkdir -p ~/.local/bin
-cat >~/.local/bin/computer <<EOF
+# set up an executable in ~/.computer/bin
+mkdir -p ~/.computer/bin
+cat >~/.computer/bin/computer <<EOF
 #!/bin/sh
-exec swipl -q -t main -s ~/.local/computer/computer.pl "\$@"
+exec swipl -q -t main -s ~/.computer/computer/computer.pl "\$@"
 EOF
-chmod a+x ~/.local/bin/computer
+chmod a+x ~/.computer/bin/computer
 
-# add ~/.local/bin to your PATH
+# add ~/.computer/bin to your PATH
 # (the exact commands depend on the shell you use)
-echo 'export PATH=~/.local/bin:$PATH' >>~/.profile
+echo 'export PATH=~/.computer/bin:$PATH' >>~/.profile
 source ~/.profile
 ```
 

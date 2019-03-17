@@ -4,4 +4,4 @@ install: true
 script: "scripts/cibuild.sh"
 notifications:
     email:
-        - lars@yencken.org
+        - damon@sicore.com
