@@ -1,13 +1,8 @@
-# Computer ("hopscotch")
+# Computer 
 
-[![Build Status](https://travis-ci.org/monadicus/computer.png)](https://travis-ci.org/monadicus/computer) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/monadicus/computer)
-
-
-Test-driven system administration in SWI-Prolog, in the style of [Babushka](https://github.com/benhoskings/babushka).
+Experimental fork of [Marelle](https://github.com/larsyencken/marelle) to create a simple shell hack.
 
 Computer uses [logic programming](https://en.wikipedia.org/wiki/Logic_programming) to describe system targets and rules by which these targets can be met. Prolog's built-in search mechanism makes writing and using these dependencies elegant. Anecdotally, writing deps for Computer has the feel of teaching it about types of packages, rather than the feel of writing package templates.
-
-![Hopscotch for Seniors](https://raw.github.com/wiki/monadicus/computer/img/HopscotchForSeniors.jpg)
 
 ## Current status
 
@@ -27,7 +22,7 @@ It also has some interesting differences:
 - The dependencies of a target can vary by platform
 - Succinct definition of new classes of packages using logical rules
 
-## Installing computer
+## Installing 'computer'
 
 ### Quickstart
 
@@ -35,7 +30,6 @@ Pick a bootstrap script from the options below. If you're not sure, choose the s
 
 Version | Bootstrap command
 ------- | -----------------
-_0.1.0 (stable)_ | `bash -c "$(curl -fsSL https://raw.githubusercontent.com/monadicus/computer/versions/0.1.0/bootstrap.sh)"`
 _master (dev)_ | `bash -c "$(curl -fsSL https://raw.githubusercontent.com/monadicus/computer/master/bootstrap.sh)"`
 
 This will install computer for all users, putting the executable in `/usr/local/bin/computer`.
