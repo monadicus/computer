@@ -383,7 +383,6 @@ discern(selfupdate, _) :-
     assertz(computer_has_been_updated).
 
 :- include('00-util').
-:- include('01-python').
 :- include('02-fs').
 :- include('03-homebrew').
 :- include('04-apt').

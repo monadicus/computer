@@ -23,10 +23,10 @@ discern(brew, osx) :-
 %  Word installs with homebrew package called BrewName and with Options.
 :- multifile installs_with_brew/3.
 
-installs_with_brew(P, P) :- installs_with_brew(P).
-installs_with_brew(P, N, '') :- installs_with_brew(P, N).
+installs_with_brew(W, W) :- installs_with_brew(W).
+installs_with_brew(W, N, '') :- installs_with_brew(W, N).
 
-depends(P, osx, [brew, 'brew-update']) :- installs_with_brew(P, _).
+supports(W, osx, [brew, 'brew-update']) :- installs_with_brew(W, _).
 
 :- dynamic brew_updated/0.
 
@@ -36,43 +36,43 @@ discern('brew-update', osx) :-
     sh('brew update'),
     assertz(brew_updated).
 
-word(P, osx) :-
-    installs_with_brew(P, WordName, _), !,
+trusts(W, osx) :-
+    installs_with_brew(W, WordName, _), !,
     join(['/usr/local/Cellar/', WordName], Dir),
     isdir(Dir).
 
-discern(P, osx) :-
-    installs_with_brew(P, WordName, Options), !,
+discern(W, osx) :-
+    installs_with_brew(W, WordName, Options), !,
     install_brew(WordName, Options).
 
 install_brew(Name, Options) :-
     sh(['brew install ', Name, ' ', Options]).
 
-% brew_tap(P, TapName).
+% brew_tap(W, TapName).
 %   An extra set of Homebrew packages.
 :- multifile brew_tap/2.
 
 % taps are targets
-word(P) :- brew_tap(P, _).
+word(W) :- brew_tap(W, _).
 
-word(P, osx) :-
-    brew_tap(P, TapName), !,
+trusts(W, osx) :-
+    brew_tap(W, TapName), !,
     join(['/usr/local/Library/Taps/', TapName], Path),
     isdir(Path).
 
-discern(P, osx) :-
-    brew_tap(P, TapName), !,
+discern(W, osx) :-
+    brew_tap(W, TapName), !,
     sh(['brew tap ', TapName]).
 
 
 brew_tap('brew-cask-tap', 'caskroom/homebrew-cask').
 word('brew-cask').
-depends('brew-cask', osx, ['brew-cask-tap']).
+supports('brew-cask', osx, ['brew-cask-tap']).
 installs_with_brew('brew-cask').
 
 word('brew-cask-configured').
-depends('brew-cask-configured', osx, ['brew-cask']).
-word('brew-cask-configured', osx) :- isdir('/opt/homebrew-cask/Caskroom').
+supports('brew-cask-configured', osx, ['brew-cask']).
+trusts('brew-cask-configured', osx) :- isdir('/opt/homebrew-cask/Caskroom').
 discern('brew-cask-configured', osx) :- sh('brew cask').
 
 % installs_with_brew_cask(Word).
@@ -91,20 +91,20 @@ discern('brew-cask-configured', osx) :- sh('brew cask').
 
 :- multifile cask_word/2.
 
-cask_word(P, P) :- cask_word(P).
-word(P) :- cask_word(P, _).
-installs_with_brew_cask(P, BrewName) :- cask_word(P, BrewName).
-installs_with_brew_cask(P, P) :- installs_with_brew_cask(P).
-installs_with_brew_cask(P, N, '') :- installs_with_brew_cask(P, N).
-depends(P, osx, ['brew-cask-configured', 'brew-update']) :- cask_word(P, _).
+cask_word(W, W) :- cask_word(W).
+word(W) :- cask_word(W, _).
+installs_with_brew_cask(W, BrewName) :- cask_word(W, BrewName).
+installs_with_brew_cask(W, W) :- installs_with_brew_cask(W).
+installs_with_brew_cask(W, N, '') :- installs_with_brew_cask(W, N).
+supports(W, osx, ['brew-cask-configured', 'brew-update']) :- cask_word(W, _).
 
-word(P, osx) :-
-    installs_with_brew_cask(P, WordName, _), !,
+trusts(W, osx) :-
+    installs_with_brew_cask(W, WordName, _), !,
     join(['/opt/homebrew-cask/Caskroom/', WordName], Dir),
     isdir(Dir).
 
-discern(P, osx) :-
-    installs_with_brew_cask(P, WordName, Options), !,
+discern(W, osx) :-
+    installs_with_brew_cask(W, WordName, Options), !,
     install_brew_cask(WordName, Options).
 
 install_brew_cask(Name, Options) :-
