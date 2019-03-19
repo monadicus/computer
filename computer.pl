@@ -87,13 +87,13 @@ main(trusts, [Word]) :-
     !,
     ( word(Word) ->
         ( trusts(Word) ->
-            writeln('ok')
+            writeln('Yes.')
         ;
-            writeln('not trusted'),
+            writeln('No.'),
             fail
         )
     ;
-        join(['ERROR: ', Word, ' is not defined by any ontology.'], Msg),
+        join([Word, ' is not defined by any ontology.'], Msg),
         writeln(Msg),
         fail
     ).
@@ -122,7 +122,7 @@ discern_recursive(Word) :- discern_recursive(Word, 0).
 
 discern_recursive(Word, Depth0) :-
     ( word(Word) ->
-        ( cached_trust(Word) ->
+        ( cached_trusts(Word) ->
             join([Word, ' ✓'], M0),
             writeln_indent(M0, Depth0)
         ; ( join([Word, ' {'], M2),
@@ -133,7 +133,7 @@ discern_recursive(Word, Depth0) :-
             repeat_val(Depth, L, Depths),
             maplist(discern_recursive, Deps, Depths),
             discern(Word),
-            cached_trust(Word)
+            cached_trusts(Word)
         ) ->
             join(['} ok ✓'], M4),
             writeln_indent(M4, Depth0)
@@ -169,10 +169,10 @@ discern(Word) :-
 
 :- dynamic already_trusts/1.
 
-cached_trust(Word) :-
+cached_trusts(Word) :-
     ( already_trusts(Word) ->
         true
-    ; trust(Word) ->
+    ; trusts(Word) ->
         assertz(already_trusts(Word))
     ).
 
@@ -213,7 +213,7 @@ ismissing_ann(word(_, untrusted)).
 word_state(Ann) :-
     word(Word),
     ground(Word),
-    ( cached_trust(Word) ->
+    ( cached_trusts(Word) ->
         Ann = word(Word, trusted)
     ;
         Ann = word(Word, untrusted)
