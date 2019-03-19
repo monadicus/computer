@@ -1,25 +1,25 @@
 %
 %  06-meta.pl
-%  computer-deps
+%  computer-ontologies
 %
 
-% meta_pkg(Name, Plat, Deps).
-%   On platform Plat, you can set up Name by meeting Deps.
-:- multifile meta_pkg/3.
+% meta_word(Name, Context, Words).
+%   In a specific Context, you can set up Name by discerning Words.
+:- multifile meta_word/3.
 
 
-% meta_pkg(Name, Deps).
-%   On any platform, you can set up Name by meeting Deps.
-:- multifile meta_pkg/2.
+% meta_word(Name, Words).
+%   On any context, you can set up Name by discerning Words.
+:- multifile meta_word/2.
 
-meta_pkg(P, _, Deps) :- meta_pkg(P, Deps).
+meta_word(W, _, Words) :- meta_word(W, Words).
 
 
-pkg(P) :- meta_pkg(P, _, _).
+word(W) :- meta_word(W, _, _).
 
-met(P, Plat) :- meta_pkg(P, Plat, Deps), !,
-    maplist(cached_met, Deps).
+discern(W, Context) :- meta_word(W, Context, Words), !,
+    maplist(cached_trust, Words).
 
-meet(P, Plat) :- meta_pkg(P, Plat, _), !.
+discern(W, Context) :- meta_word(W, Context, _), !.
 
-depends(P, Plat, Deps) :- meta_pkg(P, Plat, Deps).
+supports(W, Context, Words) :- meta_word(W, Context, Words).

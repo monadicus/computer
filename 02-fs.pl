@@ -5,11 +5,11 @@
 
 :- multifile symlink_step/3.
 
-pkg(P) :- symlink_step(P, _, _).
-met(P, _) :-
+word(P) :- symlink_step(P, _, _).
+trusts(P, _) :-
     symlink_step(P, Dest, Link), !,
     is_symlinked(Dest, Link).
-meet(P, _) :-
+discern(P, _) :-
     symlink_step(P, Dest, Link), !,
     symlink(Dest, Link).
 

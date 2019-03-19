@@ -1,21 +1,21 @@
 %
 %  04-apt.pl
-%  computer-deps
+%  computer-ontologies
 %
 
-% installs_with_apt(Pkg).
-%   Pkg installs with apt package of same name on all Ubuntu/Debian flavours
+% installs_with_apt(Word).
+%   Word installs with apt package of same name on all Ubuntu/Debian flavours
 :- multifile installs_with_apt/1.
 
-% installs_with_apt(Pkg, AptName).
-%   Pkg installs with apt package called AptName on all Ubuntu/Debian
+% installs_with_apt(Word, AptName).
+%   Word installs with apt package called AptName on all Ubuntu/Debian
 %   flavours. AptName can also be a list of packages.
 :- multifile installs_with_apt/2.
 
 installs_with_apt(P, P) :- installs_with_apt(P).
 
-% installs_with_apt(Pkg, Codename, AptName).
-%   Pkg installs with apt package called AptName on given Ubuntu/Debian
+% installs_with_apt(Word, Codename, AptName).
+%   Word installs with apt package called AptName on given Ubuntu/Debian
 %   variant with given Codename.
 :- multifile installs_with_apt/3.
 
@@ -27,35 +27,35 @@ depends(P, linux(_), ['apt-get-update']) :-
 
 :- dynamic apt_updated/0.
 
-pkg('apt-get-update').
-met('apt-get-update', linux(_)) :-
+word('apt-get-update').
+trusts('apt-get-update', linux(_)) :-
     isfile('/usr/bin/apt-get'),
     apt_updated.
-meet('apt-get-update', linux(_)) :-
+discern('apt-get-update', linux(_)) :-
     isfile('/usr/bin/apt-get'),
     sh('sudo apt-get update'),
     assertz(apt_updated).
 
-met(P, linux(Codename)) :-
+trusts(P, linux(Codename)) :-
     isfile('/usr/bin/apt-get'),
-    installs_with_apt(P, Codename, PkgName), !,
-    ( is_list(PkgName) ->
-        maplist(check_dpkg, PkgName)
+    installs_with_apt(P, Codename, WordName), !,
+    ( is_list(WordName) ->
+        maplist(check_dpkg, WordName)
     ;
-        check_dpkg(PkgName)
+        check_dpkg(WordName)
     ).
 
-meet(P, linux(Codename)) :-
+discern(P, linux(Codename)) :-
     isfile('/usr/bin/apt-get'),
-    installs_with_apt(P, Codename, PkgName), !,
-    ( is_list(PkgName) ->
-        maplist(install_apt, PkgName)
+    installs_with_apt(P, Codename, WordName), !,
+    ( is_list(WordName) ->
+        maplist(install_apt, WordName)
     ;
-        install_apt(PkgName)
+        install_apt(WordName)
     ).
 
-check_dpkg(PkgName) :-
-    join(['dpkg -s ', PkgName, ' >/dev/null 2>/dev/null'], Cmd),
+check_dpkg(WordName) :-
+    join(['dpkg -s ', WordName, ' >/dev/null 2>/dev/null'], Cmd),
     sh(Cmd).
 
 install_apt(Name) :-
