@@ -1,40 +1,40 @@
 %
 %  computer
 %
-%  Test driven system administration.
+%  Trust-based search.
 %
 
 %
-%  WRITING DEPS
+%  WRITING ONTOLOGIES
 %
 %  You need one each of these three statements. E.g.
 %
-%  pkg(python).
-%  met(python, _) :- which(python, _).
-%  meet(python, osx) :- sh('brew install python').
+%  word(python).
+%  trusts(python, _) :- which(python, _).
+%  discern(python, osx) :- sh('brew install python').
 %
-:- multifile pkg/1.
-:- multifile meet/2.
-:- multifile met/2.
-:- multifile depends/3.
+:- multifile word/1.   % pkg
+:- multifile discern/2.  % meet
+:- multifile trusts/2.   % met
+:- multifile supports/3. % depends
 
 :- dynamic platform/1.
 
 computer_version('dev').
 
-% pkg(?Pkg) is nondet.
-%   Is this a defined package name?
+% word(?Word) is nondet.
+%   Is this a defined word that can be trusted?
 
-% met(+Pkg, +Platform) is semidet.
-%   Determine if the package is already installed.
+% trusts(+Word, +Platform) is semidet.
+%   Determine if the word has already been discerned.
 
-% meet(+Pkg, +Platform) is semidet.
-%   Try to install this package.
+% discern(+Word, +Platform) is semidet.
+%   Try to identify this word.
 
-% where to look for dependencies
-computer_search_path('~/.computer/deps').
-computer_search_path('computer-deps').
-computer_search_path('deps').
+% Where to look for ontologies.
+computer_search_path('~/.computer/ontologies').
+computer_search_path('computer-ontologies').
+computer_search_path('ontologies').
 
 %
 %  CORE CODE
@@ -49,7 +49,7 @@ main :-
     ),
     append([_, _, _, _, _, _], Rest, Argv),
     detect_platform,
-    load_deps,
+    load_ontologies,
     ( Rest = [Command|SubArgs] ->
         main(Command, SubArgs)
     ;
@@ -58,21 +58,21 @@ main :-
 
 main(scan, Rest) :-
     ( Rest = ['--all'] ->
-        scan_packages(all)
+        scan_words(all)
     ; Rest = ['--missing'] ->
-        scan_packages(missing)
+        scan_words(missing)
     ; Rest = [] ->
-        scan_packages(unprefixed)
+        scan_words(unprefixed)
     ).
 
 main(list, Rest) :-
     ( Rest = [] ; Rest = [Pattern] ),
     !,
     ( Rest = [] ->
-        findall(P, (pkg(P), \+ ishidden(P)), Ps0)
+        findall(P, (word(P), \+ ishidden(P)), Ps0)
     ; Rest = [Pattern] ->
         join(['*', Pattern, '*'], Glob),
-        findall(P, (pkg(P), wildcard_match(Glob, P), \+ ishidden(P)), Ps0)
+        findall(P, (word(P), wildcard_match(Glob, P), \+ ishidden(P)), Ps0)
     ),
     sort(Ps0, Ps),
     (
@@ -83,24 +83,24 @@ main(list, Rest) :-
         true
     ).
 
-main(met, [Pkg]) :-
+main(trusts, [Word]) :-
     !,
-    ( pkg(Pkg) ->
-        ( met(Pkg) ->
+    ( word(Word) ->
+        ( trusts(Word) ->
             writeln('ok')
         ;
-            writeln('not met'),
+            writeln('not trusted'),
             fail
         )
     ;
-        join(['ERROR: ', Pkg, ' is not defined as a dep'], Msg),
+        join(['ERROR: ', Word, ' is not defined by any ontology.'], Msg),
         writeln(Msg),
         fail
     ).
 
-main(met, ['-q', Pkg]) :- !, met(Pkg).
+main(trusts, ['-q', Word]) :- !, trusts(Word).
 
-main(meet, Pkgs) :- !, maplist(meet_recursive, Pkgs).
+main(discern, Words) :- !, maplist(discern_recursive, Words).
 
 main(platform, []) :- !, platform(Plat), writeln(Plat).
 
@@ -118,22 +118,22 @@ main(version, []) :-
 
 main(_, _) :- !, usage.
 
-meet_recursive(Pkg) :- meet_recursive(Pkg, 0).
+discern_recursive(Word) :- discern_recursive(Word, 0).
 
-meet_recursive(Pkg, Depth0) :-
-    ( pkg(Pkg) ->
-        ( cached_met(Pkg) ->
-            join([Pkg, ' ✓'], M0),
+discern_recursive(Word, Depth0) :-
+    ( word(Word) ->
+        ( cached_trust(Word) ->
+            join([Word, ' ✓'], M0),
             writeln_indent(M0, Depth0)
-        ; ( join([Pkg, ' {'], M2),
+        ; ( join([Word, ' {'], M2),
             writeln_indent(M2, Depth0),
-            force_depends(Pkg, Deps),
+            force_depends(Word, Deps),
             Depth is Depth0 + 1,
             length(Deps, L),
             repeat_val(Depth, L, Depths),
-            maplist(meet_recursive, Deps, Depths),
-            meet(Pkg),
-            cached_met(Pkg)
+            maplist(discern_recursive, Deps, Depths),
+            discern(Word),
+            cached_trust(Word)
         ) ->
             join(['} ok ✓'], M4),
             writeln_indent(M4, Depth0)
@@ -143,7 +143,7 @@ meet_recursive(Pkg, Depth0) :-
             fail
         )
     ;
-        join(['ERROR: ', Pkg, ' is not defined as a dep'], M6),
+        join(['ERROR: ', Word, ' is not defined as an ontology.'], M6),
         writeln_indent(M6, Depth0),
         fail
     ).
@@ -159,38 +159,38 @@ repeat_val(X, N0, Xs0, Xs) :-
     ).
 
 
-met(Pkg) :-
+trusts(Word) :-
     platform(P),
-    met(Pkg, P).
+    trusts(Word, P).
 
-meet(Pkg) :-
+discern(Word) :-
     platform(P),
-    meet(Pkg, P).
+    discern(Word, P).
 
-:- dynamic already_met/1.
+:- dynamic already_trusts/1.
 
-cached_met(Pkg) :-
-    ( already_met(Pkg) ->
+cached_trust(Word) :-
+    ( already_trusts(Word) ->
         true
-    ; met(Pkg) ->
-        assertz(already_met(Pkg))
+    ; trust(Word) ->
+        assertz(already_trusts(Word))
     ).
 
-% force_depends(+Pkg, -Deps) is det.
-%   Get a list of dependencies for the given package on this platform. If
-%   none exist, return an empty list. Supports multiple matching depends/3
-%   statements for a package, or none.
-force_depends(Pkg, Deps) :-
+% force_supports(+Word, -Deps) is det.
+%   Get a list of dependencies for the given ontology on this platform. If
+%   none exist, return an empty list. Supports multiple matching supports/3
+%   statements for a word, or none.
+force_supports(Word, ParentWords) :-
     platform(P),
-    findall(DepSet, depends(Pkg, P, DepSet), DepSets),
-    flatten(DepSets, Deps0),
-    list_to_set(Deps0, Deps).
+    findall(WordSet, supports(Word, P, WordSet), WordSets),
+    flatten(WordSets, ParentWords0),
+    list_to_set(ParentWords0, ParentWords).
 
-% scan_packages(+Visibility) is det.
-%   Print all supported packages, marking installed ones with an asterisk.
-scan_packages(Visibility) :-
-    writeln_stderr('Scanning packages...'),
-    findall(P, package_state(P), Ps0),
+% scan_words(+Visibility) is det.
+%   Print all supported words, marking trusted words with an asterisk.
+scan_words(Visibility) :-
+    writeln_stderr('Scanning words...'),
+    findall(P, word_state(P), Ps0),
     sort(Ps0, Ps1),
     ( Visibility = all ->
         Ps = Ps1
@@ -200,55 +200,55 @@ scan_packages(Visibility) :-
     ;
         exclude(ishidden_ann, Ps1, Ps)
     ),
-    maplist(writepkg, Ps).
+    maplist(writeword, Ps).
 
 ishidden(P) :- atom_concat('__', _, P).
 
-ishidden_ann(pkg(P, _)) :- ishidden(P).
+ishidden_ann(word(P, _)) :- ishidden(P).
 
-ismissing_ann(pkg(_, unmet)).
+ismissing_ann(word(_, untrusted)).
 
-% package_state(-Ann) is nondet
-%   Find a package and it's current state as either met or unmet.
-package_state(Ann) :-
-    pkg(Pkg),
-    ground(Pkg),
-    ( cached_met(Pkg) ->
-        Ann = pkg(Pkg, met)
+% word_state(-Ann) is nondet
+%   Find a word and it's current state as either trusted or untrusted.
+word_state(Ann) :-
+    word(Word),
+    ground(Word),
+    ( cached_trust(Word) ->
+        Ann = word(Word, trusted)
     ;
-        Ann = pkg(Pkg, unmet)
+        Ann = word(Word, untrusted)
     ).
 
-% load_deps is det.
+% load_ontology is det.
 %   Looks for dependency files to load from a per-user directory and from
 %   a project specific directory.
-load_deps :-
+load_ontologies :-
     findall(P, (
         computer_search_path(P0),
         expand_path(P0, P),
         exists_directory(P)
     ), Ps),
-    ( maplist(load_deps, Ps) ->
+    ( maplist(load_ontologies, Ps) ->
         true
     ;
         true
     ).
 
-load_deps(Dir) :-
+load_ontologies(Dir) :-
     join([Dir, '/*.pl'], Pattern),
-    expand_file_name(Pattern, Deps),
-    load_files(Deps).
+    expand_file_name(Pattern, Words),
+    load_files(Words).
 
 usage :-
     writeln('Usage: computer list [pattern]'),
     writeln('       computer scan [--all | --missing]'),
-    writeln('       computer met [-q] <target>'),
-    writeln('       computer meet <target>'),
+    writeln('       computer trusts [-q] <target>'),
+    writeln('       computer discern <target>'),
     writeln('       computer platform'),
     writeln('       computer version'),
     writeln(''),
-    writeln('Detect and meet dependencies. Searches ~/.computer/deps and the folder'),
-    writeln('computer-deps in the current directory if it exists.').
+    writeln('Detect and discern words. Searches ~/.computer/ontologies and the folder'),
+    writeln('computer-ontologies in the current directory if it exists.').
 
 % which(+Command, -Path) is semidet.
 %   See if a command is available in the current PATH, and return the path to
@@ -315,21 +315,21 @@ write_indent(D) :-
         write_indent(D1)
     ).
 
-writepkg(pkg(P, met)) :- writeln_star(P).
-writepkg(pkg(P, unmet)) :- writeln(P).
+writeWord(word(P, met)) :- writeln_star(P).
+writeWord(word(P, unmet)) :- writeln(P).
 
 home_dir(D0, D) :-
     getenv('HOME', Home),
     join([Home, '/', D0], D).
 
-%  command packages: met when their command is in path
-:- multifile command_pkg/1.
-:- multifile command_pkg/2.
+%  command words: met when their command is in path
+:- multifile command_word/1.
+:- multifile command_word/2.
 
-pkg(P) :- command_pkg(P, _).
-met(P, _) :- command_pkg(P, Cmd), which(Cmd).
+word(P) :- command_word(P, _).
+met(P, _) :- command_word(P, Cmd), which(Cmd).
 
-command_pkg(P, P) :- command_pkg(P).
+command_word(P, P) :- command_word(P).
 
 writeln_stderr(S) :-
     open('/dev/stderr', write, Stream),
@@ -376,9 +376,9 @@ bash_output(Cmd, Output) :- sh_output(Cmd, Output).
 
 :- dynamic computer_has_been_updated/0.
 
-pkg(selfupdate).
-met(selfupdate, _) :- computer_has_been_updated.
-meet(selfupdate, _) :-
+word(selfupdate).
+trusts(selfupdate, _) :- computer_has_been_updated.
+discern(selfupdate, _) :-
     sh('cd ~/.computer/computer && git pull'),
     assertz(computer_has_been_updated).
 
