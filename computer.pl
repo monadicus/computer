@@ -18,17 +18,17 @@
 :- multifile trusts/2.   % met
 :- multifile supports/3. % depends
 
-:- dynamic platform/1.
+:- dynamic context/1.
 
 computer_version('dev').
 
 % word(?Word) is nondet.
 %   Is this a defined word that can be trusted?
 
-% trusts(+Word, +Platform) is semidet.
+% trusts(+Word, +Context) is semidet.
 %   Determine if the word has already been discerned.
 
-% discern(+Word, +Platform) is semidet.
+% discern(+Word, +Context) is semidet.
 %   Try to identify this word.
 
 % Where to look for ontologies.
@@ -48,7 +48,7 @@ main :-
         current_prolog_flag(argv, Argv)
     ),
     append([_, _, _, _, _, _], Rest, Argv),
-    detect_platform,
+    detect_context,
     load_ontologies,
     ( Rest = [Command|SubArgs] ->
         main(Command, SubArgs)
@@ -69,15 +69,15 @@ main(list, Rest) :-
     ( Rest = [] ; Rest = [Pattern] ),
     !,
     ( Rest = [] ->
-        findall(P, (word(P), \+ ishidden(P)), Ps0)
+        findall(Word, (word(Word), \+ ishiddenWord(Word)), Words0)
     ; Rest = [Pattern] ->
         join(['*', Pattern, '*'], Glob),
-        findall(P, (word(P), wildcard_match(Glob, P), \+ ishidden(P)), Ps0)
+        findall(Word, (word(Word), wildcard_match(Glob, Word), \+ ishidden(Word)), Words0)
     ),
-    sort(Ps0, Ps),
+    sort(Words0, Words),
     (
-        member(P, Ps),
-        writeln(P),
+        member(Word, Words),
+        writeln(Word),
         fail
     ;
         true
@@ -93,7 +93,8 @@ main(trusts, [Word]) :-
             fail
         )
     ;
-        join([Word, ' is not defined by any ontology.'], Msg),
+        context(Context),
+        join([Word, ' is not defined in context ', Context, '.' ], Msg),
         writeln(Msg),
         fail
     ).
@@ -102,7 +103,7 @@ main(trusts, ['-q', Word]) :- !, trusts(Word).
 
 main(discern, Words) :- !, maplist(discern_recursive, Words).
 
-main(platform, []) :- !, platform(Plat), writeln(Plat).
+main(context, []) :- !, context(Context), writeln(Context).
 
 % start an interactive prolog shell
 main(debug, []) :- !, prolog.
@@ -127,7 +128,7 @@ discern_recursive(Word, Depth0) :-
             writeln_indent(M0, Depth0)
         ; ( join([Word, ' {'], M2),
             writeln_indent(M2, Depth0),
-            force_depends(Word, Deps),
+            force_supports(Word, Deps),
             Depth is Depth0 + 1,
             length(Deps, L),
             repeat_val(Depth, L, Depths),
@@ -143,7 +144,7 @@ discern_recursive(Word, Depth0) :-
             fail
         )
     ;
-        join(['ERROR: ', Word, ' is not defined as an ontology.'], M6),
+        join([Word, ' is not defined as an ontology.'], M6),
         writeln_indent(M6, Depth0),
         fail
     ).
@@ -160,11 +161,11 @@ repeat_val(X, N0, Xs0, Xs) :-
 
 
 trusts(Word) :-
-    platform(P),
+    context(P),
     trusts(Word, P).
 
 discern(Word) :-
-    platform(P),
+    context(P),
     discern(Word, P).
 
 :- dynamic already_trusts/1.
@@ -177,11 +178,11 @@ cached_trusts(Word) :-
     ).
 
 % force_supports(+Word, -Deps) is det.
-%   Get a list of dependencies for the given ontology on this platform. If
+%   Get a list of dependencies for the given ontology on this context. If
 %   none exist, return an empty list. Supports multiple matching supports/3
 %   statements for a word, or none.
 force_supports(Word, ParentWords) :-
-    platform(P),
+    context(P),
     findall(WordSet, supports(Word, P, WordSet), WordSets),
     flatten(WordSets, ParentWords0),
     list_to_set(ParentWords0, ParentWords).
@@ -200,7 +201,7 @@ scan_words(Visibility) :-
     ;
         exclude(ishidden_ann, Ps1, Ps)
     ),
-    maplist(writeword, Ps).
+    maplist(writeWord, Ps).
 
 ishidden(P) :- atom_concat('__', _, P).
 
@@ -244,7 +245,7 @@ usage :-
     writeln('       computer scan [--all | --missing]'),
     writeln('       computer trusts [-q] <target>'),
     writeln('       computer discern <target>'),
-    writeln('       computer platform'),
+    writeln('       computer context'),
     writeln('       computer version'),
     writeln(''),
     writeln('Detect and discern words. Searches ~/.computer/ontologies and the folder'),
@@ -260,31 +261,31 @@ which(Command, Path) :-
 %   See if a command is available in the current PATH.
 which(Command) :- which(Command, _).
 
-% platform(-Platform).
-%   Determines the current platform (e.g. osx, ubuntu). Needs to be called
-%   after detect_platform/0 has set the platform.
-platform(_) :- fail.
+% context(-Context).
+%   Determines the current context (e.g. osx, ubuntu). Needs to be called
+%   after detect_context/0 has set the context.
+context(_) :- fail.
 
-% detect_platform is det.
-%   Sets platform/1 with the current platform.
-detect_platform :-
+% detect_context is det.
+%   Sets context/1 with the current context.
+detect_context :-
     sh_output('uname -s', OS),
     ( OS = 'Linux' ->
         linux_name(Name),
-        Platform = linux(Name)
+        Context = linux(Name)
     ; OS = 'Darwin' ->
-        Platform = osx
+        Context = osx
     ; OS = 'FreeBSD' ->
-        Platform = freebsd
+        Context = freebsd
     ; OS = 'OpenBSD' ->
-        Platform = openbsd
+        Context = openbsd
     ; OS = 'NetBSD' ->
-        Platform = netbsd
+        Context = netbsd
     ;
-        Platform = unknown
+        Context = unknown
     ),
-    retractall(platform(_)),
-    assertz(platform(Platform)).
+    retractall(context(_)),
+    assertz(context(Context)).
 
 join(L, R) :- atomic_list_concat(L, R).
 
@@ -315,21 +316,21 @@ write_indent(D) :-
         write_indent(D1)
     ).
 
-writeWord(word(P, met)) :- writeln_star(P).
-writeWord(word(P, unmet)) :- writeln(P).
+writeWord(word(W, trusted)) :- writeln_star(W).
+writeWord(word(W, untrusted)) :- writeln(W).
 
 home_dir(D0, D) :-
     getenv('HOME', Home),
     join([Home, '/', D0], D).
 
-%  command words: met when their command is in path
+%  command words: trusted when their command is in path
 :- multifile command_word/1.
 :- multifile command_word/2.
 
-word(P) :- command_word(P, _).
-met(P, _) :- command_word(P, Cmd), which(Cmd).
+word(Word) :- command_word(Word, _).
+trusts(Word, _) :- command_word(Word, Command), which(Command).
 
-command_word(P, P) :- command_word(P).
+command_word(Word, Word) :- command_word(Word).
 
 writeln_stderr(S) :-
     open('/dev/stderr', write, Stream),
