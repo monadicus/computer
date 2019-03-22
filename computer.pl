@@ -69,7 +69,7 @@ main(list, Rest) :-
     ( Rest = [] ; Rest = [Pattern] ),
     !,
     ( Rest = [] ->
-        findall(Word, (word(Word), \+ ishiddenWord(Word)), Words0)
+        findall(Word, (word(Word), \+ ishidden(Word)), Words0)
     ; Rest = [Pattern] ->
         join(['*', Pattern, '*'], Glob),
         findall(Word, (word(Word), wildcard_match(Glob, Word), \+ ishidden(Word)), Words0)
@@ -383,12 +383,12 @@ discern(selfupdate, _) :-
     sh('cd ~/.computer/computer && git pull'),
     assertz(computer_has_been_updated).
 
-:- include('00-util').
+:- include('util').
 :- include('02-fs').
 :- include('03-homebrew').
 :- include('04-apt').
 :- include('05-git').
-:- include('06-meta').
+:- include('discern').
 :- include('07-managed').
 :- include('08-pacman').
 :- include('09-freebsd').
