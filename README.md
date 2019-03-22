@@ -1,8 +1,8 @@
 # Computer 
 
-Experimental fork of [Marelle](https://github.com/larsyencken/marelle) to create a simple shell hack.
+Experimental fork of [Marelle](https://github.com/larsyencken/marelle) to create a simple shell hack as a front-end for a distributed peer-to-peer search engine using Prolog..
 
-Computer uses [logic programming](https://en.wikipedia.org/wiki/Logic_programming) to describe system targets and rules by which these targets can be met. Prolog's built-in search mechanism makes writing and using these dependencies elegant. Anecdotally, writing deps for Computer has the feel of teaching it about types of packages, rather than the feel of writing package templates.
+Computer uses [logic programming](https://en.wikipedia.org/wiki/Logic_programming) to describe search terms, contexts, and rules to provide a recursive search mechanism.  Prolog's built-in unification and search mechanisms makes writing and using Web search terms and their dependencies elegant. Anecdotally, writing search terms for Computer has the feel of teaching it about types, rather than the feel of writing a list of searches one does on any given centralized search engine today.
 
 ## Current status
 
@@ -10,17 +10,17 @@ Experimental but working.
 
 ## Features
 
-Computer has some features common to other configuration management frameworks:
+Computer has a few features
 
 - Checking and meeting dependencies (preconditions)
-- Testing whether a target installed correctly (post-conditions)
-- Ability to use platform-dependent instructions
+- Testing whether a search term has already been discerned (post-conditions)
+- Ability to specify context-dependent search.
 
 It also has some interesting differences:
 
-- Can write checks (`met` predicates) without needing to say how to meet them (`meet` predicates)
-- The dependencies of a target can vary by platform
-- Succinct definition of new classes of packages using logical rules
+- Can write checks (`trusts` predicates) without needing to say how to meet them (`discern` predicates)
+- The dependencies of a search term can vary by context.
+- Succinct definition of new types of search terms using logical rules
 
 ## Installing 'computer'
 
