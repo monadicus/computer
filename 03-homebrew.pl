@@ -6,7 +6,7 @@
 %  http://mxcl.github.io/homebrew/
 %
 
-command_word(brew).
+discerned_word(brew).
 
 discern(brew, osx) :-
     sh('ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"').

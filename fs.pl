@@ -1,16 +1,18 @@
 %
-%  02-fs.pl
-%  computer-deps
+%  fs.pl
+%  
+%  Adds support for computer to discern words from
+%  A directory of symlinks to words.
 %
 
-:- multifile symlink_step/3.
+:- multifile symlink_trusts/3.
 
-word(P) :- symlink_step(P, _, _).
-trusts(P, _) :-
-    symlink_step(P, Dest, Link), !,
+word(Word) :- symlink_trusts(Word, _, _).
+trusts(Word, _) :-
+    symlink_trusts(Word, Dest, Link), !,
     is_symlinked(Dest, Link).
-discern(P, _) :-
-    symlink_step(P, Dest, Link), !,
+discern(Word, _) :-
+    symlink_trusts(Word, Dest, Link), !,
     symlink(Dest, Link).
 
 % is_symlinked(+Dest, +Link) is semidet.

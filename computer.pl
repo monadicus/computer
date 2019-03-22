@@ -324,13 +324,13 @@ home_dir(D0, D) :-
     join([Home, '/', D0], D).
 
 %  command words: trusted when their command is in path
-:- multifile command_word/1.
-:- multifile command_word/2.
+:- multifile discerned_word/1.
+:- multifile discerned_word/2.
 
-word(Word) :- command_word(Word, _).
-trusts(Word, _) :- command_word(Word, Command), which(Command).
+word(Word) :- discerned_word(Word, _).
+trusts(Word, _) :- discerned_word(Word, Command), which(Command).
 
-command_word(Word, Word) :- command_word(Word).
+discerned_word(Word, Word) :- discerned_word(Word).
 
 writeln_stderr(S) :-
     open('/dev/stderr', write, Stream),
@@ -384,10 +384,10 @@ discern(selfupdate, _) :-
     assertz(computer_has_been_updated).
 
 :- include('util').
-:- include('02-fs').
+:- include('fs').
 :- include('03-homebrew').
 :- include('04-apt').
-:- include('05-git').
+:- include('git').
 :- include('discern').
 :- include('07-managed').
 :- include('08-pacman').
